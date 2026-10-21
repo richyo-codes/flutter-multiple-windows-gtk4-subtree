@@ -5,7 +5,7 @@ not a separate Flutter package. Run from the repository root with the custom
 GTK4 SDK and experimental windowing enabled:
 
 ```sh
-flutter run -d linux --linux-gtk=gtk4 -t examples/popup/main.dart
+flutter run -d linux -t examples/popup/main.dart
 ```
 
 For a locally built engine, add the same local-engine options documented in

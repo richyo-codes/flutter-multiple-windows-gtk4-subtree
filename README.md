@@ -35,19 +35,27 @@ windowing flag must be enabled before building either variant:
 ```sh
 FLUTTER_ROOT=/path/to/flutter-gtk4
 "$FLUTTER_ROOT/bin/flutter" config --enable-windowing --enable-linux-desktop
-"$FLUTTER_ROOT/bin/flutter" run -d linux --linux-gtk=gtk4 -t lib/main.dart
+"$FLUTTER_ROOT/bin/flutter" run -d linux
 ```
 
 For a locally built debug engine, add its paths:
 
 ```sh
-"$FLUTTER_ROOT/bin/flutter" run -d linux --linux-gtk=gtk4 \
+"$FLUTTER_ROOT/bin/flutter" run -d linux \
   -t lib/main.dart \
   --local-engine=host_debug_unopt --local-engine-host=host_debug_unopt \
   --local-engine-src-path="$FLUTTER_ROOT/engine/src"
 ```
 
-Change `--linux-gtk=gtk4` to `--linux-gtk=gtk3` for the comparison build.
+`pubspec.yaml` selects GTK4 by default for this project. Add
+`--linux-gtk=gtk3` for a comparison build; an explicit command-line flag
+overrides the project default. This requires the custom tool's precedence fix
+(`7359f41f8af` or later on the integration branch). Older fork SDKs, including
+the current CI pin, require an explicit `--linux-gtk=gtk4` flag because they
+incorrectly prefer the option's GTK3 default. CI specifies each variant explicitly.
+
+This repository does not currently configure FVM. Select your custom SDK via
+`FLUTTER_ROOT` as above; the pubspec setting selects a GTK variant, not an SDK.
 The default `lib/main.dart` entry point is the complete upstream example.
 Use `-t examples/popup/main.dart` for the focused popup reproduction. The separate native
 header-bar experiment is [deferred](tools/GTK4_HEADER_BAR.md).
