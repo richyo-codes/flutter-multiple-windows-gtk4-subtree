@@ -1,0 +1,70 @@
+name: Linux popup demo builds
+
+on:
+  push:
+    branches: ['**']
+  pull_request:
+  workflow_dispatch:
+  workflow_call:
+
+permissions:
+  contents: read
+
+jobs:
+  linux:
+    name: Linux ${{ matrix.gtk }} release
+    runs-on: ubuntu-24.04
+    timeout-minutes: 45
+    strategy:
+      fail-fast: false
+      matrix:
+        gtk: [gtk4, gtk3]
+    env:
+      FLUTTER_SDK_SHA: e95aed6a2a35bdcc2242d944e08267b78f9ea317
+      FLUTTER_PREBUILT_ENGINE_VERSION: e0462bb4b7f33fb7bf4c59ba2a73cfa1d0385ce1
+      FLUTTER_ENGINE_STORAGE_BASE_URL: https://pub-79a02b1963fb4da6b5e4e4816e8b7146.r2.dev
+      FLUTTER_LINUX_GTK: ${{ matrix.gtk }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Compute artifact version
+        shell: bash
+        run: |
+          echo "ARTIFACT_VERSION=$(git describe --always --tags --dirty)" >> "$GITHUB_ENV"
+      - name: Install Linux dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y clang cmake ninja-build pkg-config libgtk-4-dev libgtk-3-dev liblzma-dev libstdc++-12-dev libmimalloc-dev curl unzip xz-utils
+      - name: Check out pinned custom Flutter SDK
+        uses: actions/checkout@v4
+        with:
+          repository: richyo-codes/flutter
+          ref: ${{ env.FLUTTER_SDK_SHA }}
+          path: .ci/flutter
+          persist-credentials: false
+      - name: Set up matching SDK and engines
+        shell: bash
+        run: |
+          sdk="$GITHUB_WORKSPACE/.ci/flutter"
+          test "$(git -C "$sdk" rev-parse HEAD)" = "$FLUTTER_SDK_SHA"
+          FLUTTER_STORAGE_BASE_URL="$FLUTTER_ENGINE_STORAGE_BASE_URL" "$sdk/bin/flutter" --version
+          test "$(cat "$sdk/bin/cache/engine.stamp")" = "$FLUTTER_PREBUILT_ENGINE_VERSION"
+          "$sdk/bin/flutter" config --enable-linux-desktop --enable-windowing --no-analytics
+          "$sdk/bin/flutter" precache --linux
+          bash tool/install_prebuilt_engines.sh "$sdk"
+          echo "$sdk/bin" >> "$GITHUB_PATH"
+      - name: Resolve dependencies
+        run: flutter pub get
+      - name: Build native popup demo
+        run: flutter build linux --release --linux-gtk=${{ matrix.gtk }} -t lib/popup_demo.dart
+      - name: Verify and package bundle
+        run: bash tool/package_linux.sh "${{ matrix.gtk }}"
+      - name: Upload downloadable bundle
+        uses: actions/upload-artifact@v4
+        with:
+          name: multiple-windows-linux-x64-${{ matrix.gtk }}-${{ env.ARTIFACT_VERSION }}
+          path: dist/*
+          if-no-files-found: error
+          compression-level: 0
+          retention-days: 14
