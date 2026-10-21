@@ -1,5 +1,8 @@
 #!/usr/bin/env bash
 set -euo pipefail
+# shellcheck source=tools/flutter_env.sh
+source "$(dirname "$0")/flutter_env.sh"
+FLUTTER_SDK_SHA="$(python3 -c 'import json; print(json.load(open(".fvmrc"))["flutter"])')"
 variant="${1:?Usage: $0 gtk4|gtk3}"
 case "$variant" in
   gtk4) bundle=build/linux-gtk4/x64/release/bundle; expected=libgtk-4.so; forbidden=libgtk-3.so ;;
