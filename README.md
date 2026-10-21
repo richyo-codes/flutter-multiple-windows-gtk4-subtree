@@ -28,45 +28,61 @@ ENGINE_REPO=/path/to/flutter tool/sync_from_flutter_engine.sh master
 
 ## Running
 
-Enable experimental windowing once for this Flutter checkout:
+Use a custom Flutter GTK4 checkout with matching engine artifacts. Flutter's
+standard stable SDK does not supply this GTK4 implementation. The experimental
+windowing flag must be enabled before building either variant:
 
 ```sh
-../../bin/flutter config --enable-windowing
+FLUTTER_ROOT=/path/to/flutter-gtk4
+"$FLUTTER_ROOT/bin/flutter" config --enable-windowing --enable-linux-desktop
+"$FLUTTER_ROOT/bin/flutter" run -d linux --linux-gtk=gtk4 -t lib/popup_demo.dart
 ```
 
-After building the local engine, run the default GTK3 runner from this
-directory:
+For a locally built debug engine, add its paths:
 
 ```sh
-../../bin/flutter run -d linux \
-  --local-engine=host_debug_unopt \
-  --local-engine-host=host_debug_unopt \
-  --local-engine-src-path=../../engine/src
+"$FLUTTER_ROOT/bin/flutter" run -d linux --linux-gtk=gtk4 \
+  -t lib/popup_demo.dart \
+  --local-engine=host_debug_unopt --local-engine-host=host_debug_unopt \
+  --local-engine-src-path="$FLUTTER_ROOT/engine/src"
 ```
 
-To exercise the GTK4 runner with a locally built engine:
+Change `--linux-gtk=gtk4` to `--linux-gtk=gtk3` for the comparison build.
+Use `-t lib/main.dart` for the complete upstream example. The separate native
+header-bar experiment is [deferred](tool/GTK4_HEADER_BAR.md).
 
-```sh
-../../bin/flutter run -d linux \
-  --linux-gtk=gtk4 \
-  --local-engine=host_debug_unopt \
-  --local-engine-host=host_debug_unopt \
-  --local-engine-src-path=../../engine/src
-```
+## Popup portability demonstration
 
-Build the required local engine first from the repository root:
+The focused entry point reuses the upstream example's `PopupWindowController`,
+animated content sizing, and editable field. Two anchors exercise placement
+in different parts of the parent window. See [the evidence and remaining
+limitations](tool/GTK4_POPUPS.md) before presenting it as a completed backend.
 
-```sh
-./engine/src/build.sh
-```
+GTK4 hosts these popups in `GtkPopover`, which implements a native popup
+surface without being a `GtkWindow`. Keep native registration and capability
+APIs flexible enough to represent that distinction. GTK owns constrained
+placement; the current backend does not report the final adjusted offset in
+the same way as GTK3's `moved-to-rect` signal.
 
-The GTK4 path supports all four controller types. Regular and dialog
-controllers use `GtkWindow`; tooltip and popup controllers use `GtkPopover`,
-which GTK4 can anchor to the parent Flutter view without relying on removed
-`GdkWindow` positioning APIs. GTK owns the final compositor-safe placement,
-including flipping the popover to stay on screen.
+## Downloadable builds
 
-GTK4 popovers are transient widget surfaces, not independent toplevel windows.
-Consequently, their host handle is a `GtkPopover`, and the GTK4 backend cannot
-report a compositor-adjusted final offset in the same way as GTK3's
-`moved-to-rect` signal.
+The Linux build workflow runs on branch pushes, pull requests, and manual
+dispatch. Independent GTK4 and GTK3 jobs build `lib/popup_demo.dart` in release
+mode and upload `.tar.gz` bundles with checksums and `BUILD_INFO.txt`. GTK4
+failure does not cancel GTK3, or vice versa. Extract the entire archive and
+run `./multiple_windows`; keep its `lib` and `data` directories alongside it.
+
+The runner is Ubuntu 24.04 x64; bundles require compatible system GTK and
+runtime libraries and are not universal Linux packages. SDK and engine pins
+are explicit in `.github/workflows/linux-build.yml`, following the prebuilt
+engine approach used by the public pcalc project. Both variants use the same
+custom SDK so their experimental Dart windowing API matches.
+
+**The current published engine pin predates the popup parent-resize fix.**
+Compilation and linkage checks pass, but this pin is not a fixed popup demo.
+Update the SDK/engine pins together after publishing a matching fixed engine
+and rerun the native popup regression before promoting its GTK4 bundle.
+
+A separate workflow publishes both bundles as a GitHub prerelease when a
+`v*` tag is pushed. Ordinary CI only uploads Actions artifacts. No release is
+published by running the local scripts.

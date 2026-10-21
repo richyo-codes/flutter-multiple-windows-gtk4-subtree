@@ -1,0 +1,32 @@
+name: Publish Linux popup demo release
+
+on:
+  push:
+    tags: ['v*']
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    uses: ./.github/workflows/linux-build.yml
+  publish:
+    needs: build
+    runs-on: ubuntu-24.04
+    permissions:
+      actions: read
+      contents: write
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: multiple-windows-linux-x64-*
+          merge-multiple: true
+          path: dist
+      - name: Publish tagged bundles
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+          RELEASE_TAG: ${{ github.ref_name }}
+        run: |
+          test "$(find dist -name '*.tar.gz' | wc -l)" -eq 2
+          gh release create "$RELEASE_TAG" --verify-tag --generate-notes --prerelease dist/*
