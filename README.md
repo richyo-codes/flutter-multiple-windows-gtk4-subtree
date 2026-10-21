@@ -1,7 +1,7 @@
 # multiple_windows
 
-A reference application demonstrating multi-window support for Flutter using a
-rich semantics windowing API.
+A reference application demonstrating Flutter's experimental multi-window API,
+with Linux GTK3 and GTK4 runners and a focused native popup demonstration.
 
 ## Syncing From Flutter
 
@@ -26,6 +26,16 @@ argument:
 ENGINE_REPO=/path/to/flutter tools/sync_from_flutter_engine.sh master
 ```
 
+Only `examples/multiple_windows` is imported, with its contents mapped to this
+repository's root. The script fetches the split commit into this repository
+before merging it, retains shared ancestry, and records the source Flutter
+revision in the merge commit. Repository-specific changes remain in the merge
+history; overlapping edits may require conflict resolution.
+
+`ENGINE_REMOTE` selects the remote in the Flutter checkout (default: `origin`).
+Syncing imports example source from the fetched ref, not uncommitted Flutter
+changes, and does not update this project's `.fvmrc` or precompiled-engine pin.
+
 ## Running
 
 The project pins the public [Flutter GTK4 fork](https://github.com/richyo-codes/flutter)
@@ -34,7 +44,8 @@ use the same public artifact source as pcalc. No engine compilation is needed.
 
 On Linux x86_64, install Dart, FVM, Python 3, curl, unzip, binutils, Clang,
 CMake, Ninja, pkg-config, GTK3/GTK4 development packages, and mimalloc development
-headers (see the CI workflow for Ubuntu package names), then run:
+headers (see [the CI workflow](.github/workflows/linux-build.yml) for Ubuntu
+package names), then run from the repository root:
 
 ```sh
 dart pub global activate fvm 4.3.1
@@ -63,8 +74,19 @@ The SDK may report `Failed to find the latest git commit date` for the engine
 artifact revision; local debug and release builds still complete.
 
 The default `lib/main.dart` entry point is the complete upstream example.
-Use `-t examples/popup/main.dart` for the focused popup reproduction. The separate native
-header-bar experiment is [deferred](tools/GTK4_HEADER_BAR.md).
+Satellite creation is disabled on Linux because the pinned Linux windowing
+implementation throws `UnimplementedError` for it under both GTK3 and GTK4.
+The app labels the disabled satellite controls accordingly. Regular windows,
+dialogs, tooltips, and popups use separate controller paths.
+
+Run the focused popup reproduction or compare GTK3 with:
+
+```sh
+tools/flutter.sh run -d linux --linux-gtk=gtk4 -t examples/popup/main.dart
+tools/flutter.sh run -d linux --linux-gtk=gtk3 -t examples/popup/main.dart
+```
+
+The separate native header-bar experiment is [deferred](tools/GTK4_HEADER_BAR.md).
 
 ## Popup portability demonstration
 
@@ -78,6 +100,29 @@ surface without being a `GtkWindow`. Keep native registration and capability
 APIs flexible enough to represent that distinction. GTK owns constrained
 placement; the current backend does not report the final adjusted offset in
 the same way as GTK3's `moved-to-rect` signal.
+
+To check the interaction, open **Show Popup**, watch its animated size, click
+outside to dismiss it, and reopen it several times. Repeat with the second
+anchor. The parent window should retain its size while the popup grows and
+shrinks. A successful build or app launch alone does not validate these
+interactions; keyboard input and focus still need investigation.
+
+Local validation bundles described in [the evidence](tools/GTK4_POPUPS.md)
+include the parent-resize and popup-shrinking fixes. They are generated artifacts,
+not the engines installed by `tools/setup_flutter.sh`. Rebuilding with the pinned
+SDK can replace those bundles with the older published engine.
+
+## Building locally
+
+After setup, build the complete application in either variant:
+
+```sh
+tools/flutter.sh build linux --release --linux-gtk=gtk4 -t lib/main.dart
+tools/flutter.sh build linux --release --linux-gtk=gtk3 -t lib/main.dart
+```
+
+Use `-t examples/popup/main.dart` to build the focused demo instead. These commands
+use the published SDK and engine pins; they do not compile a local Flutter engine.
 
 ## Downloadable builds
 
