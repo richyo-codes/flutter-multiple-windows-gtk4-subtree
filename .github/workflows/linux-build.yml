@@ -1,4 +1,4 @@
-name: Linux popup demo builds
+name: Linux multi-window builds
 
 on:
   push:
@@ -56,8 +56,10 @@ jobs:
           echo "$sdk/bin" >> "$GITHUB_PATH"
       - name: Resolve dependencies
         run: flutter pub get
-      - name: Build native popup demo
+      - name: Check focused popup demo build
         run: flutter build linux --release --linux-gtk=${{ matrix.gtk }} -t lib/popup_demo.dart
+      - name: Build full multi-window application for upload
+        run: flutter build linux --release --linux-gtk=${{ matrix.gtk }} -t lib/main.dart
       - name: Verify and package bundle
         run: bash tool/package_linux.sh "${{ matrix.gtk }}"
       - name: Upload downloadable bundle

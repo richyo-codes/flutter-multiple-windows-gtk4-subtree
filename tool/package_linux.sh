@@ -18,7 +18,7 @@ if ! grep -Fq "$expected" <<< "$linkage" ||
   exit 1
 fi
 cp LICENSE "$bundle/"
-printf 'App commit: %s\nFlutter commit: %s\nEngine artifacts: %s\nGTK: %s\nMode: release\nEntry point: lib/popup_demo.dart\n' \
+printf 'App commit: %s\nFlutter commit: %s\nEngine artifacts: %s\nGTK: %s\nMode: release\nEntry point: lib/main.dart\n' \
   "$(git rev-parse HEAD)" "${FLUTTER_SDK_SHA:?}" \
   "${FLUTTER_PREBUILT_ENGINE_VERSION:?}" "$variant" > "$bundle/BUILD_INFO.txt"
 mkdir -p dist
