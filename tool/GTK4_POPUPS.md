@@ -2,7 +2,7 @@
 
 ## Reproduction
 
-Build `lib/popup_demo.dart` with experimental windowing enabled and the GTK4
+Build `examples/popup/main.dart` with experimental windowing enabled and the GTK4
 engine. Open the upper **Show Popup** button. The popup contains an animated,
 content-sized view and an editable field. Click outside it and reopen it;
 also try the lower-right anchor.

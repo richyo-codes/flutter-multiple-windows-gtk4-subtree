@@ -10,8 +10,8 @@ import 'package:flutter/services.dart';
 import 'package:flutter/src/widgets/_window.dart';
 import 'package:material_ui/material_ui.dart';
 
-import 'app/models.dart';
-import 'app/popup_button.dart';
+import 'package:multiple_windows/app/models.dart';
+import 'package:multiple_windows/app/popup_button.dart';
 
 /// A focused native popup example, independent of the header-bar extension.
 void main() {
