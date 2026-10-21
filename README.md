@@ -54,6 +54,13 @@ The project pins the public [Flutter GTK4 fork](https://github.com/richyo-codes/
 in `.fvmrc`. SDK downloads and precompiled debug, profile, and release engines
 use the same public artifact source as pcalc. No engine compilation is needed.
 
+`tools/flutter_env.sh` exports `FLUTTER_PREBUILT_ENGINE_VERSION` as
+`e0462bb4b7f33fb7bf4c59ba2a73cfa1d0385ce1` and `FLUTTER_STORAGE_BASE_URL` as
+`https://pub-79a02b1963fb4da6b5e4e4816e8b7146.r2.dev` for both installation and
+builds. Engine archives live under `flutter_infra_release/flutter/<artifact ID>`.
+The pinned SDK requests the published fonts archive at
+`flutter_infra_release/flutter/fonts/3012db47f3130e62f7cc0beabff968a33cbec8d8/fonts.zip`.
+
 On Linux x86_64, install Dart, FVM, Python 3, curl, unzip, binutils, Clang,
 CMake, Ninja, pkg-config, GTK3/GTK4 development packages, and mimalloc development
 headers (see [the CI workflow](.github/workflows/linux-build.yml) for Ubuntu
