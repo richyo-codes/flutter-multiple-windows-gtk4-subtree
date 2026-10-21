@@ -15,7 +15,7 @@ The backend's GTK4 host is a GtkPopover. A private Sway Wayland run recorded
 ## Floating the parent under Sway
 
 A tiling layout can override application size requests. To observe those
-requests, add `include /path/to/flutter-multiple-windows/tool/sway-demo.conf`
+requests, add `include /path/to/flutter-multiple-windows/tools/sway-demo.conf`
 to your Sway configuration and reload it with `swaymsg reload`, then reopen
 the example. The rules match only the parent titles of the focused and full
 examples; they do not force a size or change popup behavior.

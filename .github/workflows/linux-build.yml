@@ -52,7 +52,7 @@ jobs:
           test "$(cat "$sdk/bin/cache/engine.stamp")" = "$FLUTTER_PREBUILT_ENGINE_VERSION"
           "$sdk/bin/flutter" config --enable-linux-desktop --enable-windowing --no-analytics
           "$sdk/bin/flutter" precache --linux
-          bash tool/install_prebuilt_engines.sh "$sdk"
+          bash tools/install_prebuilt_engines.sh "$sdk"
           echo "$sdk/bin" >> "$GITHUB_PATH"
       - name: Resolve dependencies
         run: flutter pub get
@@ -61,7 +61,7 @@ jobs:
       - name: Build full multi-window application for upload
         run: flutter build linux --release --linux-gtk=${{ matrix.gtk }} -t lib/main.dart
       - name: Verify and package bundle
-        run: bash tool/package_linux.sh "${{ matrix.gtk }}"
+        run: bash tools/package_linux.sh "${{ matrix.gtk }}"
       - name: Upload downloadable bundle
         uses: actions/upload-artifact@v4
         with:

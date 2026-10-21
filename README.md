@@ -10,7 +10,7 @@ This repository is a root-level subtree split of Flutter's
 engine checkout, run:
 
 ```sh
-tool/sync_from_flutter_engine.sh
+tools/sync_from_flutter_engine.sh
 ```
 
 By default, the engine checkout is the sibling `flutter-gtk4` directory.
@@ -23,7 +23,7 @@ use a different Flutter checkout, or pass another engine ref as the first
 argument:
 
 ```sh
-ENGINE_REPO=/path/to/flutter tool/sync_from_flutter_engine.sh master
+ENGINE_REPO=/path/to/flutter tools/sync_from_flutter_engine.sh master
 ```
 
 ## Running
@@ -50,14 +50,14 @@ For a locally built debug engine, add its paths:
 Change `--linux-gtk=gtk4` to `--linux-gtk=gtk3` for the comparison build.
 The default `lib/main.dart` entry point is the complete upstream example.
 Use `-t examples/popup/main.dart` for the focused popup reproduction. The separate native
-header-bar experiment is [deferred](tool/GTK4_HEADER_BAR.md).
+header-bar experiment is [deferred](tools/GTK4_HEADER_BAR.md).
 
 ## Popup portability demonstration
 
 The focused entry point reuses the upstream example's `PopupWindowController`,
 animated content sizing, and editable field. Two anchors exercise placement
 in different parts of the parent window. See [the evidence and remaining
-limitations](tool/GTK4_POPUPS.md) before presenting it as a completed backend.
+limitations](tools/GTK4_POPUPS.md) before presenting it as a completed backend.
 
 GTK4 hosts these popups in `GtkPopover`, which implements a native popup
 surface without being a `GtkWindow`. Keep native registration and capability
