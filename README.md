@@ -3,6 +3,29 @@
 A reference application demonstrating multi-window support for Flutter using a
 rich semantics windowing API.
 
+## Syncing From Flutter
+
+This repository is a root-level subtree split of Flutter's
+`examples/multiple_windows` directory. To bring in the latest version from the
+engine checkout, run:
+
+```sh
+tool/sync_from_flutter_engine.sh
+```
+
+By default, the engine checkout is the sibling `flutter-gtk4` directory.
+Tracked changes must be committed before syncing; unrelated generated files
+can remain untracked. Run the script from any directory.
+
+The script fetches `master`, creates a fresh subtree split, and merges it into
+this repository while preserving the example's history. Set `ENGINE_REPO` to
+use a different Flutter checkout, or pass another engine ref as the first
+argument:
+
+```sh
+ENGINE_REPO=/path/to/flutter tool/sync_from_flutter_engine.sh master
+```
+
 ## Running
 
 Enable experimental windowing once for this Flutter checkout:
