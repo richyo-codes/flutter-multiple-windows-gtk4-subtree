@@ -91,9 +91,11 @@ Local validation bundles (generated files, not committed):
 ./build/examples/popup-gtk4-debug/bundle/multiple_windows
 ```
 
-These bundles include both engine fixes. The published CI engine pin still
-predates them, and a future normal build can replace a local validation bundle
-with the engine selected by that build.
+These bundles include both engine fixes. The current published CI engine
+`cfd38c9e1e8de9965d24ad412cf70550ec3310f3` comes from Flutter commit
+`a916555c8d7ff9b1368363179db45ce912e65e71`, whose history includes both fixes.
+The published binaries still need a fresh native regression run. A normal build
+can replace a local validation bundle with the engine selected by that build.
 
 ## Validation limits
 

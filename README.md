@@ -55,7 +55,7 @@ in `.fvmrc`. SDK downloads and precompiled debug, profile, and release engines
 use the same public artifact source as pcalc. No engine compilation is needed.
 
 `tools/flutter_env.sh` exports `FLUTTER_PREBUILT_ENGINE_VERSION` as
-`e0462bb4b7f33fb7bf4c59ba2a73cfa1d0385ce1` and `FLUTTER_STORAGE_BASE_URL` as
+`cfd38c9e1e8de9965d24ad412cf70550ec3310f3` and `FLUTTER_STORAGE_BASE_URL` as
 `https://pub-79a02b1963fb4da6b5e4e4816e8b7146.r2.dev` for both installation and
 builds. Engine archives live under `flutter_infra_release/flutter/<artifact ID>`.
 The pinned SDK requests the published fonts archive at
@@ -87,17 +87,13 @@ are ignored by Git. Setup leaves existing editor settings alone.
 
 `pubspec.yaml` requests GTK4, but this published SDK predates the tool fix
 that honors that default. Keep `--linux-gtk=gtk4` explicit for now. Use
-`--linux-gtk=gtk3` for comparison. The published engine also predates the
-recent popup resizing fixes; this setup does not silently apply local patches.
+`--linux-gtk=gtk3` for comparison. The published engine's source includes the
+parent-resize and popup-shrinking fixes described in [the evidence](tools/GTK4_POPUPS.md).
+This setup does not apply local patches.
 The SDK may report `Failed to find the latest git commit date` for the engine
 artifact revision; local debug and release builds still complete.
 
 The default `lib/main.dart` entry point is the complete upstream example.
-Satellite creation is disabled on Linux because the pinned Linux windowing
-implementation throws `UnimplementedError` for it under both GTK3 and GTK4.
-The app labels the disabled satellite controls accordingly. Regular windows,
-dialogs, tooltips, and popups use separate controller paths.
-
 Run the focused popup reproduction or compare GTK3 with:
 
 ```sh
@@ -127,9 +123,9 @@ shrinks. A successful build or app launch alone does not validate these
 interactions; keyboard input and focus still need investigation.
 
 Local validation bundles described in [the evidence](tools/GTK4_POPUPS.md)
-include the parent-resize and popup-shrinking fixes. They are generated artifacts,
-not the engines installed by `tools/setup_flutter.sh`. Rebuilding with the pinned
-SDK can replace those bundles with the older published engine.
+include the parent-resize and popup-shrinking fixes. They are generated artifacts;
+the current published engine's source also includes those fixes. Rebuilding with
+the pinned SDK replaces local validation bundles with the published engine.
 
 ## Building locally
 
@@ -158,10 +154,11 @@ are recorded in `.fvmrc` and `tools/flutter_env.sh`, following the prebuilt
 engine approach used by the public pcalc project. Both variants use the same
 custom SDK so their experimental Dart windowing API matches.
 
-**The current published engine pin predates the popup parent-resize fix.**
-Compilation and linkage checks pass, but this pin is not a fixed popup demo.
-Update the SDK/engine pins together after publishing a matching fixed engine
-and rerun the native popup regression before promoting its GTK4 bundle.
+The published engine `cfd38c9e1e8de9965d24ad412cf70550ec3310f3` was built from
+Flutter commit `a916555c8d7ff9b1368363179db45ce912e65e71`, also pinned in `.fvmrc`.
+Its source includes the popup resizing fixes. Rerun the native popup regression
+against this published engine before promoting its GTK4 bundle; the earlier
+local validation does not establish the behavior of these newly published binaries.
 
 A separate workflow builds and publishes both bundles and their SHA-256
 checksums as a GitHub release whenever a `v*` tag is pushed. The tag supplies the
