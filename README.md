@@ -3,6 +3,13 @@
 A reference application demonstrating Flutter's experimental multi-window API,
 with Linux GTK3 and GTK4 runners and a focused native popup demonstration.
 
+The demo was extracted from Flutter's `examples/multiple_windows` directory to
+make it easier to build, run, and share independently of the full Flutter engine
+checkout. It uses a pinned Flutter SDK and matching precompiled engines, so
+trying the demo does not require compiling the engine. The subtree history lets
+us continue bringing in upstream example changes without carrying the full
+Flutter repository here.
+
 ## Syncing From Flutter
 
 This repository is a root-level subtree split of Flutter's
@@ -12,6 +19,11 @@ engine checkout, run:
 ```sh
 tools/sync_from_flutter_engine.sh
 ```
+
+The upstream source path is `flutter/flutter:examples/multiple_windows`. Our
+sync uses that same directory in the sibling `flutter-gtk4` checkout; the script
+fetches its `origin/master` by default. This source sync is separate from the
+GTK4 SDK and precompiled-engine versions used to run the extracted demo.
 
 By default, the engine checkout is the sibling `flutter-gtk4` directory.
 Tracked changes must be committed before syncing; unrelated generated files
@@ -144,6 +156,8 @@ Compilation and linkage checks pass, but this pin is not a fixed popup demo.
 Update the SDK/engine pins together after publishing a matching fixed engine
 and rerun the native popup regression before promoting its GTK4 bundle.
 
-A separate workflow publishes both bundles as a GitHub prerelease when a
-`v*` tag is pushed. Ordinary CI only uploads Actions artifacts. No release is
-published by running the local scripts.
+A separate workflow builds and publishes both bundles and their SHA-256
+checksums as a GitHub release whenever a `v*` tag is pushed. The tag supplies the
+artifact version, and publishing requires both GTK builds and checksum checks
+to pass. Ordinary branch and pull-request CI only uploads Actions artifacts.
+No release is published by running the local scripts.
