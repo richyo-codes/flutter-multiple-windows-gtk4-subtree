@@ -13,4 +13,4 @@ the root README. `flutter run` without `-t` continues to launch the full
 multi-window app in `lib/main.dart`. CI uploads the full app; this focused
 entry point is also built as a compilation check.
 
-See `tool/GTK4_POPUPS.md` for native regression evidence and known limitations.
+See `tools/GTK4_POPUPS.md` for native regression evidence and known limitations.
