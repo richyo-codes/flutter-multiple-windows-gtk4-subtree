@@ -62,6 +62,39 @@ the fixed engine passed (800×600 → 800×600). Its output includes protocol lo
 and a screenshot. Supply the original and fixed engine directories separately
 for the regression comparison.
 
+## Follow-up: popup stops shrinking
+
+Repeated opening exposed a second downstream bug after the parent-resize fix.
+The render widget's previous texture still supplied its natural size, so a
+smaller content request could remain allocated at the previous larger size.
+The fix honors an explicit content-size request when measuring the widget.
+
+Engine commit `ded64505b82` on `cleanup/gtk4-formatting-folded-20261018`
+contains this fix, a widget-measurement regression, and an expanded native
+regression covering three popup openings. The new unit test fails with the
+old implementation and passes with the fix; the existing texture measurement
+test also passes. In the native test, the old popup remained at 300 pixels wide
+after a 301-pixel peak. The fixed popup returns to 270 pixels after peaks of
+301–302 pixels on all three openings. Parent size remains 800×600.
+
+The full `lib/main.dart` app was also smoke-tested with floating and tiled
+parents under headless Sway. Both created native popup surfaces. This does
+not establish that every desktop-specific animation or unusually large initial
+popup reported by a user is resolved; manual testing remains useful.
+
+Local validation bundles (generated files, not committed):
+
+```sh
+# Full app, the normal default entry point:
+./build/linux-gtk4/x64/debug/bundle/multiple_windows
+# Focused example:
+./build/examples/popup-gtk4-debug/bundle/multiple_windows
+```
+
+These bundles include both engine fixes. The published CI engine pin still
+predates them, and a future normal build can replace a local validation bundle
+with the engine selected by that build.
+
 ## Validation limits
 
 Local GTK3 and GTK4 release builds succeeded using the CI pins. The isolated
