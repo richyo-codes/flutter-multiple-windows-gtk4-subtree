@@ -57,7 +57,7 @@ jobs:
       - name: Resolve dependencies
         run: flutter pub get
       - name: Check focused popup demo build
-        run: flutter build linux --release --linux-gtk=${{ matrix.gtk }} -t lib/popup_demo.dart
+        run: flutter build linux --release --linux-gtk=${{ matrix.gtk }} -t examples/popup/main.dart
       - name: Build full multi-window application for upload
         run: flutter build linux --release --linux-gtk=${{ matrix.gtk }} -t lib/main.dart
       - name: Verify and package bundle

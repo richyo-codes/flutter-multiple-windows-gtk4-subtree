@@ -35,20 +35,21 @@ windowing flag must be enabled before building either variant:
 ```sh
 FLUTTER_ROOT=/path/to/flutter-gtk4
 "$FLUTTER_ROOT/bin/flutter" config --enable-windowing --enable-linux-desktop
-"$FLUTTER_ROOT/bin/flutter" run -d linux --linux-gtk=gtk4 -t lib/popup_demo.dart
+"$FLUTTER_ROOT/bin/flutter" run -d linux --linux-gtk=gtk4 -t lib/main.dart
 ```
 
 For a locally built debug engine, add its paths:
 
 ```sh
 "$FLUTTER_ROOT/bin/flutter" run -d linux --linux-gtk=gtk4 \
-  -t lib/popup_demo.dart \
+  -t lib/main.dart \
   --local-engine=host_debug_unopt --local-engine-host=host_debug_unopt \
   --local-engine-src-path="$FLUTTER_ROOT/engine/src"
 ```
 
 Change `--linux-gtk=gtk4` to `--linux-gtk=gtk3` for the comparison build.
-Use `-t lib/main.dart` for the complete upstream example. The separate native
+The default `lib/main.dart` entry point is the complete upstream example.
+Use `-t examples/popup/main.dart` for the focused popup reproduction. The separate native
 header-bar experiment is [deferred](tool/GTK4_HEADER_BAR.md).
 
 ## Popup portability demonstration
@@ -67,7 +68,7 @@ the same way as GTK3's `moved-to-rect` signal.
 ## Downloadable builds
 
 The Linux build workflow runs on branch pushes, pull requests, and manual
-dispatch. Independent GTK4 and GTK3 jobs check that `lib/popup_demo.dart` builds,
+dispatch. Independent GTK4 and GTK3 jobs check that `examples/popup/main.dart` builds,
 then build the full `lib/main.dart` application in release mode for upload.
 The downloadable `.tar.gz` bundles include checksums and `BUILD_INFO.txt`. GTK4
 failure does not cancel GTK3, or vice versa. Extract the entire archive and
