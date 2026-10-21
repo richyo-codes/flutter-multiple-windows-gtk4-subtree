@@ -29,8 +29,9 @@ By default, the engine checkout is the sibling `flutter-gtk4` directory.
 Tracked changes must be committed before syncing; unrelated generated files
 can remain untracked. Run the script from any directory.
 
-The script fetches `master`, creates a fresh subtree split, and merges it into
-this repository while preserving the example's history. Set `ENGINE_REPO` to
+The script fetches Flutter's `master`, creates a fresh subtree split, and
+fast-forwards local `main` to that upstream-only history. It then rebases the
+checked-out feature branch's custom commits onto `main`. Set `ENGINE_REPO` to
 use a different Flutter checkout, or pass another engine ref as the first
 argument:
 
@@ -40,9 +41,15 @@ ENGINE_REPO=/path/to/flutter tools/sync_from_flutter_engine.sh master
 
 Only `examples/multiple_windows` is imported, with its contents mapped to this
 repository's root. The script fetches the split commit into this repository
-before merging it, retains shared ancestry, and records the source Flutter
-revision in the merge commit. Repository-specific changes remain in the merge
-history; overlapping edits may require conflict resolution.
+before updating `main` and prints the source Flutter revision. Keep all
+repository-specific changes on feature branches; `main` contains only the
+upstream subtree. The script refuses to replace a divergent upstream branch.
+Set `UPSTREAM_BRANCH=master` if this repository uses `master` instead of `main`.
+
+Rebasing changes feature commit IDs and may require conflict resolution. Use
+`git rebase --continue` after resolving conflicts, or `git rebase --abort` to
+restore the feature branch (`main` stays updated). The script does not push
+branches; coordinate before replacing a previously published feature branch.
 
 `ENGINE_REMOTE` selects the remote in the Flutter checkout (default: `origin`).
 Syncing imports example source from the fetched ref, not uncommitted Flutter
