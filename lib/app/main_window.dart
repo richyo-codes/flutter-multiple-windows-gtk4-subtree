@@ -6,7 +6,6 @@
 // ignore_for_file: implementation_imports
 
 import 'package:flutter/src/widgets/_window.dart';
-import 'package:flutter/src/widgets/_window_linux.dart';
 import 'package:material_ui/material_ui.dart';
 
 import 'dialog_window_content.dart';
@@ -21,7 +20,6 @@ import 'tooltip_window_edit_dialog.dart';
 import 'window_content.dart';
 import 'window_edit_dialog.dart';
 import 'window_settings_dialog.dart';
-import 'gtk4_header_bar_demo.dart';
 
 class MainWindow extends StatelessWidget {
   const MainWindow({super.key, required this.controller});
@@ -208,15 +206,6 @@ class _WindowCreatorCard extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
-                    if (windowController is WindowControllerLinux &&
-                        windowController.supportsGtk4HeaderBar) ...[
-                      OutlinedButton.icon(
-                        icon: const Icon(Icons.web_asset),
-                        label: const Text('GTK4 Header Bar'),
-                        onPressed: () => showGtk4HeaderBarDemo(context),
-                      ),
-                      const SizedBox(height: 8),
-                    ],
                     OutlinedButton(
                       onPressed: () {
                         late final WindowEntry entry;
