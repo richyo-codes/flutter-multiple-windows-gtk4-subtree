@@ -67,8 +67,9 @@ the same way as GTK3's `moved-to-rect` signal.
 ## Downloadable builds
 
 The Linux build workflow runs on branch pushes, pull requests, and manual
-dispatch. Independent GTK4 and GTK3 jobs build `lib/popup_demo.dart` in release
-mode and upload `.tar.gz` bundles with checksums and `BUILD_INFO.txt`. GTK4
+dispatch. Independent GTK4 and GTK3 jobs check that `lib/popup_demo.dart` builds,
+then build the full `lib/main.dart` application in release mode for upload.
+The downloadable `.tar.gz` bundles include checksums and `BUILD_INFO.txt`. GTK4
 failure does not cancel GTK3, or vice versa. Extract the entire archive and
 run `./multiple_windows`; keep its `lib` and `data` directories alongside it.
 

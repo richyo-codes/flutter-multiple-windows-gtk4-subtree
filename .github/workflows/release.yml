@@ -1,4 +1,4 @@
-name: Publish Linux popup demo release
+name: Publish Linux multi-window release
 
 on:
   push:
