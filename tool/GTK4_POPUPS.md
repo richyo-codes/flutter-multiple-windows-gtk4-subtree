@@ -12,6 +12,30 @@ It does not call GTK APIs or require the native popup handle to be a GtkWindow.
 The backend's GTK4 host is a GtkPopover. A private Sway Wayland run recorded
 `xdg_surface.get_popup`, confirming an actual native popup surface.
 
+## Floating the parent under Sway
+
+A tiling layout can override application size requests. To observe those
+requests, add `include /path/to/flutter-multiple-windows/tool/sway-demo.conf`
+to your Sway configuration and reload it with `swaymsg reload`, then reopen
+the example. The rules match only the parent titles of the focused and full
+examples; they do not force a size or change popup behavior.
+
+For an already-open focused demo, run:
+
+```sh
+swaymsg '[title="^Native popup portability demo$"] floating enable'
+```
+
+For the full example:
+
+```sh
+swaymsg '[title="^Multi-Window Reference Application$"] floating enable'
+```
+
+The automated geometry test floats its parent in a private Sway session.
+Floating makes the parent-resize defect visible; it is not a workaround for
+popup sizing, animation, or input defects.
+
 ## Parent-resize defect found by this demo
 
 Affected local engine source: `eb4303071049cfccbce41ec468e276b0e9361821`.
