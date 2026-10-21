@@ -27,8 +27,11 @@ jobs:
           fetch-depth: 0
       - name: Compute artifact version
         shell: bash
+        env:
+          BUILD_TAG: ${{ github.ref_type == 'tag' && github.ref_name || '' }}
         run: |
-          echo "ARTIFACT_VERSION=$(git describe --always --tags --dirty)" >> "$GITHUB_ENV"
+          version="${BUILD_TAG:-$(git describe --always --tags --dirty)}"
+          echo "ARTIFACT_VERSION=${version//\//-}" >> "$GITHUB_ENV"
       - name: Install Linux dependencies
         run: |
           sudo apt-get update
