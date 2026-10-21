@@ -50,3 +50,6 @@ app.*.map.json
 
 # Machine-specific FVM SDK links and cache metadata.
 /.fvm/
+
+# Generated macOS settings contain machine-specific SDK and project paths.
+/macos/Flutter/ephemeral/
