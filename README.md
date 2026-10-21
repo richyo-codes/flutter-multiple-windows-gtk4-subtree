@@ -28,34 +28,40 @@ ENGINE_REPO=/path/to/flutter tools/sync_from_flutter_engine.sh master
 
 ## Running
 
-Use a custom Flutter GTK4 checkout with matching engine artifacts. Flutter's
-standard stable SDK does not supply this GTK4 implementation. The experimental
-windowing flag must be enabled before building either variant:
+The project pins the public [Flutter GTK4 fork](https://github.com/richyo-codes/flutter)
+in `.fvmrc`. SDK downloads and precompiled debug, profile, and release engines
+use the same public artifact source as pcalc. No engine compilation is needed.
+
+On Linux x86_64, install Dart, FVM, Python 3, curl, unzip, binutils, Clang,
+CMake, Ninja, pkg-config, GTK3/GTK4 development packages, and mimalloc development
+headers (see the CI workflow for Ubuntu package names), then run:
 
 ```sh
-FLUTTER_ROOT=/path/to/flutter-gtk4
-"$FLUTTER_ROOT/bin/flutter" config --enable-windowing --enable-linux-desktop
-"$FLUTTER_ROOT/bin/flutter" run -d linux
+dart pub global activate fvm 4.3.1
+export PATH="$HOME/.pub-cache/bin:$PATH"
+bash tools/setup_flutter.sh
+tools/flutter.sh run -d linux --linux-gtk=gtk4
 ```
 
-For a locally built debug engine, add its paths:
+`tools/flutter.sh` invokes `fvm flutter` with the matching engine version.
+For direct FVM commands, load that environment first:
 
 ```sh
-"$FLUTTER_ROOT/bin/flutter" run -d linux \
-  -t lib/main.dart \
-  --local-engine=host_debug_unopt --local-engine-host=host_debug_unopt \
-  --local-engine-src-path="$FLUTTER_ROOT/engine/src"
+source tools/flutter_env.sh
+fvm flutter run -d linux --linux-gtk=gtk4
 ```
 
-`pubspec.yaml` selects GTK4 by default for this project. Add
-`--linux-gtk=gtk3` for a comparison build; an explicit command-line flag
-overrides the project default. This requires the custom tool's precedence fix
-(`7359f41f8af` or later on the integration branch). Older fork SDKs, including
-the current CI pin, require an explicit `--linux-gtk=gtk4` flag because they
-incorrectly prefer the option's GTK3 default. CI specifies each variant explicitly.
+Keep this environment when launching an IDE too; its Flutter SDK is the
+project-relative `.fvm/flutter_sdk`. FVM's SDK symlink and generated metadata
+are ignored by Git. Setup leaves existing editor settings alone.
 
-This repository does not currently configure FVM. Select your custom SDK via
-`FLUTTER_ROOT` as above; the pubspec setting selects a GTK variant, not an SDK.
+`pubspec.yaml` requests GTK4, but this published SDK predates the tool fix
+that honors that default. Keep `--linux-gtk=gtk4` explicit for now. Use
+`--linux-gtk=gtk3` for comparison. The published engine also predates the
+recent popup resizing fixes; this setup does not silently apply local patches.
+The SDK may report `Failed to find the latest git commit date` for the engine
+artifact revision; local debug and release builds still complete.
+
 The default `lib/main.dart` entry point is the complete upstream example.
 Use `-t examples/popup/main.dart` for the focused popup reproduction. The separate native
 header-bar experiment is [deferred](tools/GTK4_HEADER_BAR.md).
@@ -84,7 +90,7 @@ run `./multiple_windows`; keep its `lib` and `data` directories alongside it.
 
 The runner is Ubuntu 24.04 x64; bundles require compatible system GTK and
 runtime libraries and are not universal Linux packages. SDK and engine pins
-are explicit in `.github/workflows/linux-build.yml`, following the prebuilt
+are recorded in `.fvmrc` and `tools/flutter_env.sh`, following the prebuilt
 engine approach used by the public pcalc project. Both variants use the same
 custom SDK so their experimental Dart windowing API matches.
 

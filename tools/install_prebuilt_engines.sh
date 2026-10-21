@@ -54,20 +54,21 @@ verify_engine_bundle() {
   fi
 }
 
-cache_mode=linux-x64-release
-archive_mode="$cache_mode"
-if [[ "$cache_mode" == linux-x64 ]]; then
-  archive_mode=linux-x64-debug
-fi
-destination="$engine_root/$cache_mode"
-archive_url="$archive_base/$archive_mode/linux-x64-flutter-gtk.zip"
-archive_file="$(mktemp "${TMPDIR:-/tmp}/multiple-windows-engine.XXXXXX.zip")"
-trap 'rm -f "$archive_file"' EXIT
-mkdir -p "$destination"
-curl --fail --location --retry 3 --retry-all-errors --silent --show-error \
-  "$archive_url" -o "$archive_file"
-unzip -tq "$archive_file"
-unzip -q -o "$archive_file" -d "$destination"
-rm -f "$archive_file"
-trap - EXIT
-verify_engine_bundle "$destination" "$archive_mode"
+for cache_mode in linux-x64 linux-x64-profile linux-x64-release; do
+  archive_mode="$cache_mode"
+  if [[ "$cache_mode" == linux-x64 ]]; then
+    archive_mode=linux-x64-debug
+  fi
+  destination="$engine_root/$cache_mode"
+  archive_url="$archive_base/$archive_mode/linux-x64-flutter-gtk.zip"
+  archive_file="$(mktemp "${TMPDIR:-/tmp}/multiple-windows-engine.XXXXXX.zip")"
+  trap 'rm -f "$archive_file"' EXIT
+  mkdir -p "$destination"
+  curl --fail --location --retry 3 --retry-all-errors --silent --show-error \
+    "$archive_url" -o "$archive_file"
+  unzip -tq "$archive_file"
+  unzip -q -o "$archive_file" -d "$destination"
+  rm -f "$archive_file"
+  trap - EXIT
+  verify_engine_bundle "$destination" "$archive_mode"
+done

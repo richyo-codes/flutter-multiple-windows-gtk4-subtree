@@ -5,11 +5,11 @@ not a separate Flutter package. Run from the repository root with the custom
 GTK4 SDK and experimental windowing enabled:
 
 ```sh
-flutter run -d linux -t examples/popup/main.dart
+tools/flutter.sh run -d linux --linux-gtk=gtk4 -t examples/popup/main.dart
 ```
 
-For a locally built engine, add the same local-engine options documented in
-the root README. `flutter run` without `-t` continues to launch the full
+Run `bash tools/setup_flutter.sh` first, as documented in the root README.
+The same command without `-t` continues to launch the full
 multi-window app in `lib/main.dart`. CI uploads the full app; this focused
 entry point is also built as a compilation check.
 
