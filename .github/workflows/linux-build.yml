@@ -1,0 +1,61 @@
+name: Linux multi-window builds
+
+on:
+  push:
+    branches: ['**']
+  pull_request:
+  workflow_dispatch:
+  workflow_call:
+
+permissions:
+  contents: read
+
+jobs:
+  linux:
+    name: Linux ${{ matrix.gtk }} release
+    runs-on: ubuntu-24.04
+    timeout-minutes: 45
+    strategy:
+      fail-fast: false
+      matrix:
+        gtk: [gtk4, gtk3]
+    env:
+      FLUTTER_LINUX_GTK: ${{ matrix.gtk }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Compute artifact version
+        shell: bash
+        env:
+          BUILD_TAG: ${{ github.ref_type == 'tag' && github.ref_name || '' }}
+        run: |
+          version="${BUILD_TAG:-$(git describe --always --tags --dirty)}"
+          echo "ARTIFACT_VERSION=${version//\//-}" >> "$GITHUB_ENV"
+      - name: Install Linux dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y clang cmake ninja-build pkg-config libgtk-4-dev libgtk-3-dev liblzma-dev libstdc++-12-dev libmimalloc-dev curl unzip xz-utils
+      - uses: dart-lang/setup-dart@v1
+        with:
+          sdk: stable
+      - name: Install FVM
+        run: |
+          dart pub global activate fvm 4.3.1
+          echo "$HOME/.pub-cache/bin" >> "$GITHUB_PATH"
+      - name: Set up pinned SDK and precompiled engines
+        run: bash tools/setup_flutter.sh
+      - name: Check focused popup demo build
+        run: tools/flutter.sh build linux --release --linux-gtk=${{ matrix.gtk }} -t examples/popup/main.dart
+      - name: Build full multi-window application for upload
+        run: tools/flutter.sh build linux --release --linux-gtk=${{ matrix.gtk }} -t lib/main.dart
+      - name: Verify and package bundle
+        run: bash tools/package_linux.sh "${{ matrix.gtk }}"
+      - name: Upload downloadable bundle
+        uses: actions/upload-artifact@v4
+        with:
+          name: multiple-windows-linux-x64-${{ matrix.gtk }}-${{ env.ARTIFACT_VERSION }}
+          path: dist/*
+          if-no-files-found: error
+          compression-level: 0
+          retention-days: 14

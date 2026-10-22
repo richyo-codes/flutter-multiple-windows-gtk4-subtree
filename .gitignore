@@ -43,3 +43,22 @@ app.*.map.json
 /android/app/debug
 /android/app/profile
 /android/app/release
+
+# Local CI SDK checkout and packaged bundles.
+/.ci/
+/dist/
+
+# Machine-specific FVM SDK links and cache metadata.
+/.fvm/
+
+# Generated macOS settings contain machine-specific SDK and project paths.
+/macos/Flutter/ephemeral/
+
+# Flutter regenerates platform plugin registration during setup and builds.
+/linux/flutter/generated_plugin_registrant.cc
+/linux/flutter/generated_plugin_registrant.h
+/linux/flutter/generated_plugins.cmake
+/macos/Flutter/GeneratedPluginRegistrant.swift
+/windows/flutter/generated_plugin_registrant.cc
+/windows/flutter/generated_plugin_registrant.h
+/windows/flutter/generated_plugins.cmake
